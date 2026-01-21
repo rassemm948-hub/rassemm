@@ -358,9 +358,22 @@
       }
 
       function showEnd() {
+        const formspreeURL = "https://formspree.io/f/mpqqadya";
+
+        // هذا الخيط اللي يبعث الإيميل لراسم
+        fetch(formspreeURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            الاسم: player,
+            النتيجة: "بطل! كمل الـ 30 سؤال 🎉",
+            القلوب_الباقية: lives,
+          }),
+        });
+
         document.getElementById("screen").innerHTML = `
             <h1 style="color:var(--success-green); font-size: 3rem;">أستاذ! 🏆</h1>
-            <div class="info-card">برافو يا <b>${player}</b>!<br>حرقت الـ 30 سؤال وطلعت مبرمج غول.</div>
+            <div class="info-card">برافو يا <b>${player}</b>!<br>حرقت الـ 30 سؤال ووصلتني نتيجتك توة.</div>
             <div style="font-size:60px; margin: 20px 0;">🇹🇳🔥🎇</div>
             <button class="cartoon-btn" onclick="location.reload()">نعاودو الماتش؟</button>
         `;
