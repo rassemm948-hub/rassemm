@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Adventure - راسم</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tn-red: #e70013;
+        --dark-red: #9e000d;
+        --cartoon-black: #1a1a1a;
+        --success-green: #2ecc71;
+      }
+
+      body {
+        /* خلفية Mesh Gradient متحركة تبهت العين */
+        background: linear-gradient(45deg, #ff0000, #4a0000, #ff4d4d, #800000);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        font-family: "Cairo", sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* رموز تونسية تسبح في الخلفية */
+      .bg-icon {
+        position: absolute;
+        font-size: 40px;
+        opacity: 0.2;
+        z-index: 0;
+        animation: float 6s infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0);
+        }
+        50% {
+          transform: translateY(-20px) rotate(10);
+        }
+      }
+
+      #game-box {
+        background: rgba(255, 255, 255, 0.95);
+        width: 90%;
+        max-width: 450px;
+        padding: 25px;
+        border-radius: 40px;
+        border: 6px solid var(--cartoon-black);
+        box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(5px);
+      }
+
+      .stats-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .hearts {
+        color: #e74c3c;
+        font-size: 1.3rem;
+        letter-spacing: 5px;
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 12px;
+        background: #ddd;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 2px solid var(--cartoon-black);
+        overflow: hidden;
+      }
+      #progress-fill {
+        height: 100%;
+        background: var(--success-green);
+        width: 0%;
+        transition: 0.4s;
+      }
+
+      .player-tag {
+        font-size: 0.9rem;
+        color: var(--dark-red);
+        font-weight: 900;
+        margin-bottom: 5px;
+      }
+
+      .info-card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 20px;
+        border: 3px solid var(--cartoon-black);
+        margin-bottom: 20px;
+        font-weight: 900;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        font-size: 1.2rem;
+      }
+
+      .cartoon-btn {
+        background: var(--tn-red);
+        color: white;
+        border: 4px solid var(--cartoon-black);
+        padding: 14px;
+        font-size: 1.2rem;
+        font-weight: 900;
+        border-radius: 18px;
+        cursor: pointer;
+        box-shadow: 0 6px 0 var(--cartoon-black);
+        width: 100%;
+        margin-bottom: 12px;
+        transition: 0.1s ease;
+      }
+      .cartoon-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 var(--cartoon-black);
+      }
+      .cartoon-btn:hover {
+        filter: brightness(1.1);
+      }
+
+      .hint-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 5px;
+      }
+      .small-bulb {
+        background: #ffd43b;
+        border: 2.5px solid var(--cartoon-black);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 22px;
+        box-shadow: 0 4px 0 var(--cartoon-black);
+      }
+
+      .shake {
+        animation: shake 0.5s;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-icon" style="top: 10%; left: 10%">🇹🇳</div>
+    <div class="bg-icon" style="top: 30%; right: 15%">🍵</div>
+    <div class="bg-icon" style="bottom: 20%; left: 12%">🌶️</div>
+    <div class="bg-icon" style="bottom: 10%; right: 10%">🏺</div>
+
+    <div id="game-box">
+      <div id="screen">
+        <h1
+          style="color: var(--tn-red); font-size: 2.5rem; margin-bottom: 10px"
+        >
+          بـايـثـون 🔥
+        </h1>
+        <div class="info-card">
+          مرحباً بيك في أقوى تحدي!<br />أكتب اسمك باش نبدأو اللعب:
+        </div>
+        <input
+          type="text"
+          id="playerName"
+          placeholder="إسمك هنا..."
+          style="
+            width: 85%;
+            padding: 15px;
+            border: 4px solid var(--cartoon-black);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Cairo';
+            font-size: 1.1rem;
+            outline: none;
+          "
+        />
+        <button class="cartoon-btn" onclick="startAdventure()">
+          هيا يا باهي! 🚀
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let player = "";
+      let current = 0;
+      let hintsLeft = 5;
+      let lives = 3;
+
+      const jokes = [
+        "يا ولدي ثبت لا يشيّط الملاوي! 🔥",
+        "يا باهي ثبت، ظاهر فيك ساهر مع براد تاي! 🍵",
+        "ركز يا بطل لا نبعثوك للقهوة تجيب شيشة! 💨",
+        "ثبت يا غالي، الكود بدى يزلق! 🧼",
+        "يا معلم، بايثون مش لبلابي.. ركز! 🥣",
+        "ملا خبزة طاحت في الماء! ثبت روحك! 🥖",
+      ];
+
+      const quizData = [
+        {
+          q: "بش تخرج 'كتيبة' في بايثون شكون نادوا؟",
+          o: ["print()", "write()"],
+          r: 0,
+        },
+        { q: "بش تحول نص لرقم صحيح؟", o: ["text()", "int()"], r: 1 },
+        { q: "تحب تطلب معلومة مالـ User؟", o: ["input()", "listen()"], r: 0 },
+        { q: "باش نكتبوا ملاحظة (Comment)؟", o: ["//", "#"], r: 1 },
+        { q: "رقم بالفاصل (5.5) شنوة نوعه؟", o: ["int", "float"], r: 1 },
+        { q: "بش نثبتوا في حاجة (إذا كان..)؟", o: ["if", "when"], r: 0 },
+        { q: "تكرر حاجة 10 مرات؟", o: ["range(10)", "repeat(10)"], r: 0 },
+        { q: "نوع القائمة (List)؟", o: ["( )", "[ ]"], r: 1 },
+        { q: "تزيد حاجة للـ List؟", o: ["append()", "add()"], r: 0 },
+        { q: "نتيجة 10 % 2 ؟", o: ["0", "1"], r: 0 },
+        { q: "تعريف Function جديدة؟", o: ["def", "func"], r: 0 },
+        { q: "قوة 3 (2**3)؟", o: ["8", "6"], r: 0 },
+        { q: "بايثون لغة مفسرة؟", o: ["أكيد", "لا"], r: 0 },
+        { q: "تخرج مالـ Loop؟", o: ["break", "stop"], r: 0 },
+        { q: "كيفاش نكتبوا True؟", o: ["true", "True"], r: 1 },
+        { q: "عكس الـ if؟", o: ["else", "otherwise"], r: 0 },
+        { q: "نص فيه برشة سطور؟", o: ["''' '''", "' '"], r: 0 },
+        { q: "بش تنحي الفراغات؟", o: ["strip()", "trim()"], r: 0 },
+        { q: "Dictionary تستعمل؟", o: ["{ }", "[ ]"], r: 0 },
+        {
+          q: "بش تجيب مكتبة عشوائية؟",
+          o: ["import random", "get random"],
+          r: 0,
+        },
+        { q: "لا يساوي هي؟", o: ["!=", "<>"], r: 0 },
+        { q: "تحويل لـ String؟", o: ["str()", "string()"], r: 0 },
+        { q: "type(5) تعطي؟", o: ["int", "str"], r: 0 },
+        { q: "إضافة لآخر القائمة؟", o: ["append", "insert"], r: 0 },
+        { q: "الـ Boolean فيه؟", o: ["True/False", "Yes/No"], r: 0 },
+        { q: "بايثون لغة ساهلة؟", o: ["باقة", "مستحيل"], r: 0 },
+        { q: "قيمة 5 > 3؟", o: ["True", "False"], r: 0 },
+        { q: "أقواس الـ Tuple؟", o: ["( )", "{ }"], r: 0 },
+        { q: "تحب تولي غول؟", o: ["نعم", "طبعاً"], r: 1 },
+        { q: "راسم مبرمج عالمي؟", o: ["أكيد", "فوق العادة"], r: 1 },
+      ];
+
+      function startAdventure() {
+        const n = document.getElementById("playerName").value;
+        if (!n) {
+          alert("أكتب إسمك ساعة يا باهي!");
+          return;
+        }
+        player = n;
+        render();
+      }
+
+      function render() {
+        const screen = document.getElementById("screen");
+        if (current < quizData.length) {
+          const data = quizData[current];
+          const prog = (current / quizData.length) * 100;
+          const heartsDisplay = "❤️".repeat(lives);
+          screen.innerHTML = `
+                <div class="stats-header">
+                    <span style="font-weight:900; color:#444;">${
+                      current + 1
+                    }/30</span>
+                    <span class="hearts">${heartsDisplay}</span>
+                </div>
+                <div class="progress-container"><div id="progress-fill" style="width:${prog}%"></div></div>
+                <div class="player-tag">يا ${player}، المهمة متاعك هي:</div>
+                <div class="info-card">${data.q}</div>
+                <button class="cartoon-btn" style="background:#2ecc71" onclick="check(0)">${
+                  data.o[0]
+                }</button>
+                <button class="cartoon-btn" style="background:var(--cartoon-black)" onclick="check(1)">${
+                  data.o[1]
+                }</button>
+                <div class="hint-section">
+                    <span style="font-size:0.8rem; font-weight:bold; color:#666;">مساعدة (${hintsLeft})</span>
+                    <div class="small-bulb" onclick="useHint()">💡</div>
+                </div>
+            `;
+        } else {
+          showEnd();
+        }
+      }
+
+      function check(idx) {
+        if (idx === quizData[current].r) {
+          current++;
+          render();
+        } else {
+          lives--;
+          document.getElementById("game-box").classList.add("shake");
+          setTimeout(
+            () => document.getElementById("game-box").classList.remove("shake"),
+            500
+          );
+
+          if (lives <= 0) {
+            alert(
+              "يا ${player}، وفاو القلوب! 🥖 باش ترجع من الأول، ركّز المرة الجاية!"
+            );
+            current = 0;
+            lives = 3;
+            render();
+          } else {
+            alert(jokes[Math.floor(Math.random() * jokes.length)]);
+            render();
+          }
+        }
+      }
+
+      function useHint() {
+        if (hintsLeft > 0) {
+          hintsLeft--;
+          alert(
+            "إسمع يا " +
+              player +
+              "، الإجابة هي: " +
+              quizData[current].o[quizData[current].r]
+          );
+          render();
+        } else {
+          alert("وفاو الأمبولة يا معلم! 💪");
+        }
+      }
+
+      function showEnd() {
+        document.getElementById("screen").innerHTML = `
+            <h1 style="color:var(--success-green); font-size: 3rem;">أستاذ! 🏆</h1>
+            <div class="info-card">برافو يا <b>${player}</b>!<br>حرقت الـ 30 سؤال وطلعت مبرمج غول.</div>
+            <div style="font-size:60px; margin: 20px 0;">🇹🇳🔥🎇</div>
+            <button class="cartoon-btn" onclick="location.reload()">نعاودو الماتش؟</button>
+        `;
+      }
+    </script>
+  </body>
+</html>
